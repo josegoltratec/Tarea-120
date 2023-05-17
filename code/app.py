@@ -1,21 +1,9 @@
 from flask import Flask, render_template, request
-import spacy
-from spacy.language import Language
-from spacy_langdetect import LanguageDetector
+#from classifier import SentimentClassifier
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 app = Flask(__name__)
 
-def get_lang(text):
-    nlp = spacy.load("en_core_web_sm")
-    Language.factory("language_detector", func=get_lang_detector)
-    nlp.add_pipe('language_detector', last=True)
-    doc = nlp(text)
-
-    return doc._.language
-
-
-def get_lang_detector(nlp, name):
-    return LanguageDetector()
 
 
 @app.route("/")
@@ -26,44 +14,23 @@ def index():
 @app.route("/process", methods=['POST'])
 def process():
     results = []
-    num_of_results = 0
+    result = ''
 
     if request.method == 'POST':
         rawtext = request.form.get('rawtext')
-        taskOption = request.form.get('taskoption')
+        langoption = request.form.get('langoption')
 
-        if taskOption == "organization":
-            labels = ["ORG"]
-        elif taskOption == "person":
-            labels = ["PER"]
-        elif taskOption == "money":
-            labels = ["MONEY"]
-        elif taskOption == "product":
-            labels = ["PRODUCT"]
-        elif taskOption == "geolocation":
-            labels = ["GPE"]
+        if langoption == 'es':
+            result = 0.8
+            # Manu, si has llegado hasta aquí, la librería classifier no la he encontrado y con pip3 install no va
+            # El video es de hace 3 años, no se ni si está aún viva. La he buscado en google y no la encuentro
+
+            #clf = SentimentClassifier()
+            #result = clf.predict(rawtext)
         else:
-            labels = ["ORG", "PER", "MONEY", "PRODUCT", "GPE"]
-
-        lang = get_lang(rawtext)['language']
-        print(lang)
-
-        if lang == 'en':
-            nlp = spacy.load("en_core_web_sm")
-        elif lang == 'es':
-            nlp = spacy.load("es_core_news_sm")
-        else:
-            nlp = spacy.load("en_core_web_sm")
-
-        doc = nlp(rawtext)
-
-        for ent in doc.ents:
-            print(ent.text, ent.start_char, ent.end_char, ent.label_)
-
-        results = [ent.text for ent in doc.ents if ent.label_ in labels]
+            sid = SentimentIntensityAnalyzer()
+            results = sid.polarity_scores(rawtext)
 
         print(results)
 
-        num_of_results = len(results)
-
-    return render_template('index.html', results=results, num_of_results=num_of_results)
+    return render_template('index.html', results=results, result=result)

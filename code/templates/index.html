@@ -29,14 +29,9 @@
                     <label>Tu texto</label>
             <textarea type="text" rows="5" cols="5" class="form-control"  name="rawtext" required="true">   </textarea>
             <br/>
-            <select class="form-control" name="taskoption">
-              <option selected>Seleccionar opción</option>
-              <option value="organization">Organización</option>
-              <option value="person">Persona</option>
-              <option value="money">Dinero</option>
-              <option value="geolocation">Lugares</option>
-              <option value="product">Productos</option>
-
+            <select class="form-control" name="langoption">
+              <option value="en">Inglés</option>
+              <option value="es">Español</option>
             </select>
             <br/>
             <button type="submit" class="btn btn-info"><i class="fa fa-database"></i> Enviar</button>
@@ -50,9 +45,29 @@
         <p class="alert-heading">Resultado</p>
         <p>Número de registros:{{num_of_results}}</p>
         <ul>{% for i in results %}
-        	<li>{{i}}</li>
+        	<li>{{i}} : {{ results[i] }}</li>
         	{%endfor %}
     	</ul>
+        {% if results['compound'] > 0 %}
+            <p><strong>Positivo</strong></p>
+        {% else %}
+            <p><strong>Negativo</strong></p>
+        {% endif %}
+    	</div>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="container">
+    	<div class="alert alert-success" role="alert">
+        <p class="alert-heading">Resultado</p>
+        <p>score:{{result}}</p>
+        {% if result > 0 %}
+            <p><strong>Positivo</strong></p>
+        {% else %}
+            <p><strong>Negativo</strong></p>
+        {% endif %}
+
     	</div>
     </div>
     {% endif %}
